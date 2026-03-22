@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Notatapp</title>
+</head>
+<body>
+
+<header>
+  <h1>Notatapp</h1>
+</header>
+
+<main>
+  <section>
+    <h2>Notat</h2>
+    <input id="tittel" placeholder="Tittel">
+    <input id="innhold" placeholder="Innhold">
+    <button onclick="lagreNotat()">Lagre</button>
+  </section>
+
+  <section>
+    <h2>Todo</h2>
+    <input id="todoTittel" placeholder="Tittel">
+    <div id="oppgaver">
+      <input placeholder="Oppgave"><br>
+    </div>
+    <button onclick="leggTilOppgave()">+</button>
+    <button onclick="lagreTodo()">Lagre</button>
+  </section>
+
+  <section>
+    <h2>Vis</h2>
+    <button onclick="hentNotater()">Notater</button>
+    <button onclick="hentTodolister()">Todos</button>
+    <div id="output"></div>
+  </section>
+</main>
+
+<script src="script.js"></script>
+
+</body>
+</html>

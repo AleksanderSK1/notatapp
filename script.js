@@ -49,7 +49,7 @@ async function hentNotater() {
 async function hentTodolister() {
   const response = await fetch(API + "/todolister");
   const todolister = await response.json();
-
+  
   let visning = "";
 
   todolister.forEach(liste => {

@@ -39,8 +39,11 @@ async function hentNotater() {
 
   let visning = "";
 
-  notater.forEach(notat => {
-    visning += "<p>" + notat.tittel + ": " + notat.innhold + "</p>";
+  notater.forEach((notat, i) => {
+    visning += `<p>${notat.tittel}: ${notat.innhold}
+    <button onclick="slettNotat(${i})">Slett</button>
+    <button onclick="endreNotat(${i})">Endre</button>
+    </p>`;
   });
 
   document.getElementById("output").innerHTML = visning;
@@ -52,8 +55,10 @@ async function hentTodolister() {
   
   let visning = "";
 
-  todolister.forEach(liste => {
-    visning += "<p>" + liste.tittel + "<br>";
+  todolister.forEach((liste, i) => {
+    visning += `<p>${liste.tittel}
+<button onclick="slettTodo(${i})">Slett</button>
+<button onclick="endreTodo(${i})">Endre</button><br>`;
 
     liste.oppgaver.forEach(oppgave => {
       visning += "- " + oppgave.tekst + "<br>";
@@ -63,4 +68,35 @@ async function hentTodolister() {
   });
 
   document.getElementById("output").innerHTML = visning;
+}
+
+async function slettNotat(i) {
+  await fetch(`${API}/notater/${i}`, { method: "DELETE" });
+  hentNotater();
+}
+
+async function endreNotat(i) {
+  const tittel = prompt("Ny tittel:");
+  const innhold = prompt("Nytt innhold:");
+  await fetch(`${API}/notater/${i}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tittel, innhold })
+  });
+  hentNotater();
+}
+
+async function slettTodo(i) {
+  await fetch(`${API}/todolister/${i}`, { method: "DELETE" });
+  hentTodolister();
+}
+
+async function endreTodo(i) {
+  const tittel = prompt("Ny tittel:");
+  await fetch(`${API}/todolister/${i}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ tittel })
+  });
+  hentTodolister();
 }

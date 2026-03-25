@@ -25,6 +25,24 @@ app.get("/notater", (req, res) => {
     skrivData(data);
     res.send("lagret");
   });
+
+  app.patch("/notater/:i", (req, res) => {
+    const data = lesData();
+    const i = +req.params.i;
+    if (!data.notater[i]) return res.status(404).send("Notat ikke funnet");
+    Object.assign(data.notater[i], req.body);
+    skrivData(data);
+    res.send("Oppdatert");
+  });
+  
+  app.delete("/notater/:i", (req, res) => {
+    const data = lesData();
+    const i = +req.params.i;
+    if (!data.notater[i]) return res.status(404).send("Notat ikke funnet");
+    data.notater.splice(i, 1);
+    skrivData(data);
+    res.send("Slettet");
+  });
   
   app.get("/todolister", (req, res) => {
     const data = lesData();
@@ -36,6 +54,24 @@ app.get("/notater", (req, res) => {
     data.todolister.push(req.body);
     skrivData(data);
     res.send("lagret");
+  });
+
+  app.patch("/todolister/:i", (req, res) => {
+    const data = lesData();
+    const i = +req.params.i;
+    if (!data.todolister[i]) return res.status(404).send("Todoliste ikke funnet");
+    Object.assign(data.todolister[i], req.body);
+    skrivData(data);
+    res.send("Oppdatert");
+  });
+  
+  app.delete("/todolister/:i", (req, res) => {
+    const data = lesData();
+    const i = +req.params.i;
+    if (!data.todolister[i]) return res.status(404).send("Todoliste ikke funnet");
+    data.todolister.splice(i, 1);
+    skrivData(data);
+    res.send("Slettet");
   });
   
   app.listen(8000, "0.0.0.0", () => {

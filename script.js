@@ -13,7 +13,9 @@ async function lagreNotat() {
 
 function leggTilOppgave() {
   const oppgaveContainer = document.getElementById("oppgaver");
-  oppgaveContainer.innerHTML += '<input placeholder="Oppgave"><br>';
+  const div = document.createElement("div");
+  div.innerHTML = '<input placeholder="Oppgave"><br>';
+  oppgaveContainer.appendChild(div);
 }
 
 async function lagreTodo() {

@@ -1,4 +1,4 @@
-const API = "http://192.168.20.79:8000";
+const API = "http://0.0.0.0:8000";
 
 async function lagreNotat() {
   const tittel = document.getElementById("tittel").value;

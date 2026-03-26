@@ -60,14 +60,30 @@ async function hentTodolister() {
 <button onclick="slettTodo(${i})">Slett</button>
 <button onclick="endreTodo(${i})">Endre</button><br>`;
 
-    liste.oppgaver.forEach(oppgave => {
-      visning += "- " + oppgave.tekst + "<br>";
+    liste.oppgaver.forEach((oppgave, j) => {
+      visning += `<input type="checkbox" ${oppgave.fullfort ? "checked" : ""} onchange="toggleOppgave(${i}, ${j}, this.checked)">
+      <span style="text-decoration:${oppgave.fullfort ? "line-through" : "none"}">${oppgave.tekst}</span><br>`;
     });
 
     visning += "</p>";
   });
 
   document.getElementById("output").innerHTML = visning;
+}
+
+async function toggleOppgave(listeIndex, oppgaveIndex, fullfort) {
+  const response = await fetch(API + "/todolister");
+  const todolister = await response.json();
+
+  todolister[listeIndex].oppgaver[oppgaveIndex].fullfort = fullfort;
+
+  await fetch(`${API}/todolister/${listeIndex}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ oppgaver: todolister[listeIndex].oppgaver })
+  });
+
+  hentTodolister();
 }
 
 async function slettNotat(i) {

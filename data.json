@@ -1,4 +1,19 @@
 {
-  "notater": [],
-  "todolister": []
+  "notater": [
+    {
+      "tittel": "1",
+      "innhold": ""
+    }
+  ],
+  "todolister": [
+    {
+      "tittel": "q",
+      "oppgaver": [
+        {
+          "tekst": "q",
+          "fullfort": true
+        }
+      ]
+    }
+  ]
 }

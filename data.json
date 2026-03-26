@@ -1,4 +1,17 @@
 {
-  "notater": [],
+  "notater": [
+    {
+      "tittel": "",
+      "innhold": "2"
+    },
+    {
+      "tittel": "3",
+      "innhold": ""
+    },
+    {
+      "tittel": "",
+      "innhold": "3"
+    }
+  ],
   "todolister": []
 }

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import json
  
@@ -31,7 +32,7 @@ class TodoListe(BaseModel):
     tittel: str
     oppgaver: list
  
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def hent_index():
     with open("index.html", "rb") as html_doc:
         return html_doc.read()

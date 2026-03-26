@@ -1,23 +1,4 @@
 {
-  "notater": [
-    {
-      "tittel": "uuuuu",
-      "innhold": "u"
-    },
-    {
-      "tittel": "",
-      "innhold": ""
-    }
-  ],
-  "todolister": [
-    {
-      "tittel": "ii",
-      "oppgaver": [
-        {
-          "tekst": "l",
-          "fullfort": false
-        }
-      ]
-    }
-  ]
+  "notater": [],
+  "todolister": []
 }

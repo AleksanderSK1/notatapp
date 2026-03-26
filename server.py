@@ -36,6 +36,11 @@ class TodoListe(BaseModel):
 def hent_index():
     with open("index.html", "rb") as html_doc:
         return html_doc.read()
+    
+@app.get("/script.js", response_class=HTMLResponse)
+def hent_script():
+    with open("script.js", "rb") as js_doc:
+        return js_doc
 
 @app.get("/notater")
 def hent_notater():

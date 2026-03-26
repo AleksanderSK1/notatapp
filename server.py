@@ -31,7 +31,11 @@ class TodoListe(BaseModel):
     tittel: str
     oppgaver: list
  
- 
+@app.get("/")
+def hent_index():
+    with open("index.html", "rb") as html_doc:
+        return html_doc.read()
+
 @app.get("/notater")
 def hent_notater():
     return les_data()["notater"]

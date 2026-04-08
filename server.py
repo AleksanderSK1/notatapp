@@ -3,8 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import json
- 
+import uvicorn
+
+
+
 app = FastAPI()
+
+
+
  
 app.add_middleware(
     CORSMiddleware,
@@ -41,6 +47,11 @@ def hent_index():
 def hent_script():
     with open("script.js", "rb") as js_doc:
         return js_doc
+    
+@app.get("/style.css", response_class=HTMLResponse)
+def hent_style():
+    with open("style.css", "rb") as css_doc:
+        return css_doc.read()
 
 @app.get("/notater")
 def hent_notater():

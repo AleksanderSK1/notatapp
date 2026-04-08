@@ -33,14 +33,13 @@ class TodoListe(BaseModel):
 
 @app.get("/", response_class=HTMLResponse)
 def hent_index():
-    with open("index.html", "r", encoding="utf-8") as html_doc:
-        return HTMLResponse(content=html_doc.read(), media_type="text/html")
+    return FileResponse("index.html", media_type="text/html")
 
-@app.get("/script.js")
+@app.get("/script.js", response_class=HTMLResponse)
 def hent_script():
     return FileResponse("script.js", media_type="application/javascript")
 
-@app.get("/style.css")
+@app.get("/style.css", response_class=HTMLResponse)
 def hent_style():
     return FileResponse("style.css", media_type="text/css")
 
@@ -53,7 +52,7 @@ def nytt_notat(data: Notat):
     d = les_data()
     d["notater"].append({"tittel": data.tittel, "innhold": data.innhold})
     skriv_data(d)
-    return "lagret"
+    return {"status": "lagret"}
 
 @app.patch("/notater/{i}")
 def endre_notat(i: int, data: Notat):
@@ -62,7 +61,7 @@ def endre_notat(i: int, data: Notat):
         raise HTTPException(status_code=404, detail="Notat ikke funnet")
     d["notater"][i].update({"tittel": data.tittel, "innhold": data.innhold})
     skriv_data(d)
-    return "oppdatert"
+    return {"status": "oppdatert"}
 
 @app.delete("/notater/{i}")
 def slett_notat(i: int):
@@ -71,7 +70,7 @@ def slett_notat(i: int):
         raise HTTPException(status_code=404, detail="Notat ikke funnet")
     d["notater"].pop(i)
     skriv_data(d)
-    return "slettet"
+    return {"status": "slettet"}
 
 @app.get("/todolister")
 def hent_todolister():
@@ -82,7 +81,7 @@ def ny_todoliste(data: TodoListe):
     d = les_data()
     d["todolister"].append({"tittel": data.tittel, "oppgaver": data.oppgaver})
     skriv_data(d)
-    return "lagret"
+    return {"status": "lagret"}
 
 @app.patch("/todolister/{i}")
 def endre_todoliste(i: int, data: dict):
@@ -91,7 +90,7 @@ def endre_todoliste(i: int, data: dict):
         raise HTTPException(status_code=404, detail="Todoliste ikke funnet")
     d["todolister"][i].update(data)
     skriv_data(d)
-    return "oppdatert"
+    return {"status": "oppdatert"}
 
 @app.delete("/todolister/{i}")
 def slett_todoliste(i: int):
@@ -100,4 +99,4 @@ def slett_todoliste(i: int):
         raise HTTPException(status_code=404, detail="Todoliste ikke funnet")
     d["todolister"].pop(i)
     skriv_data(d)
-    return "slettet"
+    return {"status": "slettet"}

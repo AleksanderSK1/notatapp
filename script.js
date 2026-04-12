@@ -1,4 +1,21 @@
 const API = "http://192.168.20.79:8000";
+const API_KEY = "notatapp-api";
+
+let TOKEN = ""
+
+async function login() {
+  const brukernavn = document.getElementById("brukernavn").value;
+  const passord = document.getElementById("passord").value;
+
+  const res = await fetch(API + "/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ brukernavn, passord })
+  });
+
+  const data = await res.json();
+  TOKEN = data.token;
+}
 
 async function lagreNotat() {
   const tittel = document.getElementById("tittel").value;
@@ -6,8 +23,12 @@ async function lagreNotat() {
 
   await fetch(API + "/notater", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ tittel: tittel, innhold: innhold })
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    },
+    body: JSON.stringify({ tittel, innhold })
   });
 }
 
@@ -30,13 +51,23 @@ async function lagreTodo() {
 
   await fetch(API + "/todolister", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    },
     body: JSON.stringify({ tittel: todoTittel, oppgaver: oppgaveListe })
   });
 }
 
 async function hentNotater() {
-  const response = await fetch(API + "/notater");
+  const response = await fetch(API + "/notater", {
+    headers: {
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    }
+  });
+
   const notater = await response.json();
 
   let visning = "";
@@ -52,9 +83,15 @@ async function hentNotater() {
 }
 
 async function hentTodolister() {
-  const response = await fetch(API + "/todolister");
+  const response = await fetch(API + "/todolister", {
+    headers: {
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    }
+  });
+
   const todolister = await response.json();
-  
+
   let visning = "";
 
   todolister.forEach((liste, i) => {
@@ -63,7 +100,7 @@ async function hentTodolister() {
 <button onclick="endreTodo(${i})">Endre</button><br>`;
 
     liste.oppgaver.forEach((oppgave, j) => {
-      visning += `<input type="checkbox" ${oppgave.fullfort ? "checked" : ""} onchange="toggleOppgave(${i}, ${j}, this.checked)">
+      visning += `<input type="checkbox" ${oppgave.fullfort ? "checked" : ""}>
       <span style="text-decoration:${oppgave.fullfort ? "line-through" : "none"}">${oppgave.tekst}</span><br>`;
     });
 
@@ -73,48 +110,59 @@ async function hentTodolister() {
   document.getElementById("output").innerHTML = visning;
 }
 
-async function toggleOppgave(listeIndex, oppgaveIndex, fullfort) {
-  const response = await fetch(API + "/todolister");
-  const todolister = await response.json();
-
-  todolister[listeIndex].oppgaver[oppgaveIndex].fullfort = fullfort;
-
-  await fetch(`${API}/todolister/${listeIndex}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ oppgaver: todolister[listeIndex].oppgaver })
+async function slettNotat(i) {
+  await fetch(`${API}/notater/${i}`, {
+    method: "DELETE",
+    headers: {
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    }
   });
 
-  hentTodolister();
-}
-
-async function slettNotat(i) {
-  await fetch(`${API}/notater/${i}`, { method: "DELETE" });
   hentNotater();
 }
 
 async function endreNotat(i) {
   const tittel = prompt("Ny tittel:");
   const innhold = prompt("Nytt innhold:");
+
   await fetch(`${API}/notater/${i}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    },
     body: JSON.stringify({ tittel, innhold })
   });
+
   hentNotater();
 }
 
 async function slettTodo(i) {
-  await fetch(`${API}/todolister/${i}`, { method: "DELETE" });
+  await fetch(`${API}/todolister/${i}`, {
+    method: "DELETE",
+    headers: {
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    }
+  });
+
   hentTodolister();
 }
 
 async function endreTodo(i) {
   const tittel = prompt("Ny tittel:");
+
   await fetch(`${API}/todolister/${i}`, {
     method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+      "x-token": TOKEN
+    },
     body: JSON.stringify({ tittel })
   });
+
   hentTodolister();
 }

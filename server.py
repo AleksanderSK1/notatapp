@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Header, Depends
+from fastapi import FastAPI, HTTPException, Header, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
@@ -8,21 +8,18 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://192.168.20.79:8000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 API_KEY = "notatapp-api"
-aktive_tokens = {}
 
 def sjekk_api_key(x_api_key: str = Header()):
     if x_api_key != API_KEY:
         raise HTTPException(status_code=403, detail="Ugyldig API-nøkkel")
 
-def sjekk_login(x_token: str = Header()):
-    if x_token not in aktive_tokens:
-        raise HTTPException(status_code=401, detail="Ikke logget inn")
+aktive_tokens = {}
 
 DATA_FIL = "data.json"
 
@@ -42,17 +39,7 @@ class TodoListe(BaseModel):
     tittel: str
     oppgaver: list
 
-@app.post("/login")
-def login(data: dict):
-    d = les_data()
-    for bruker in d["brukere"]:
-        if bruker["brukernavn"] == data.get("brukernavn") and bruker["passord"] == data.get("passord"):
-            token = "logget-inn"
-            aktive_tokens[token] = bruker["brukernavn"]
-            return {"token": token}
-    raise HTTPException(status_code=401, detail="Feil brukernavn/passord")
-
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def hent_index():
     return FileResponse("index.html", media_type="text/html")
 
@@ -64,19 +51,29 @@ def hent_script():
 def hent_style():
     return FileResponse("style.css", media_type="text/css")
 
+@app.post("/login")
+def login(data: dict):
+    d = les_data()
+    for bruker in d["brukere"]:
+        if bruker["brukernavn"] == data.get("brukernavn") and bruker["passord"] == data.get("passord"):
+            token = "logget-inn"
+            aktive_tokens[token] = bruker["brukernavn"]
+            return {"token": token}
+    raise HTTPException(status_code=401, detail="Feil brukernavn/passord")
+
 @app.get("/notater")
-def hent_notater(api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def hent_notater(api_key: str = Depends(sjekk_api_key)):
     return les_data()["notater"]
 
 @app.post("/notater")
-def nytt_notat(data: Notat, api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def nytt_notat(data: Notat, api_key: str = Depends(sjekk_api_key)):
     d = les_data()
     d["notater"].append({"tittel": data.tittel, "innhold": data.innhold})
     skriv_data(d)
     return {"status": "lagret"}
 
 @app.patch("/notater/{i}")
-def endre_notat(i: int, data: Notat, api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def endre_notat(i: int, data: Notat, api_key: str = Depends(sjekk_api_key)):
     d = les_data()
     if i >= len(d["notater"]):
         raise HTTPException(status_code=404, detail="Notat ikke funnet")
@@ -85,7 +82,7 @@ def endre_notat(i: int, data: Notat, api_key: str = Depends(sjekk_api_key), toke
     return {"status": "oppdatert"}
 
 @app.delete("/notater/{i}")
-def slett_notat(i: int, api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def slett_notat(i: int, api_key: str = Depends(sjekk_api_key)):
     d = les_data()
     if i >= len(d["notater"]):
         raise HTTPException(status_code=404, detail="Notat ikke funnet")
@@ -94,18 +91,18 @@ def slett_notat(i: int, api_key: str = Depends(sjekk_api_key), token: str = Depe
     return {"status": "slettet"}
 
 @app.get("/todolister")
-def hent_todolister(api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def hent_todolister(api_key: str = Depends(sjekk_api_key)):
     return les_data()["todolister"]
 
 @app.post("/todolister")
-def ny_todoliste(data: TodoListe, api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def ny_todoliste(data: TodoListe, api_key: str = Depends(sjekk_api_key)):
     d = les_data()
     d["todolister"].append({"tittel": data.tittel, "oppgaver": data.oppgaver})
     skriv_data(d)
     return {"status": "lagret"}
 
 @app.patch("/todolister/{i}")
-def endre_todoliste(i: int, data: dict, api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def endre_todoliste(i: int, data: dict, api_key: str = Depends(sjekk_api_key)):
     d = les_data()
     if i >= len(d["todolister"]):
         raise HTTPException(status_code=404, detail="Todoliste ikke funnet")
@@ -114,7 +111,7 @@ def endre_todoliste(i: int, data: dict, api_key: str = Depends(sjekk_api_key), t
     return {"status": "oppdatert"}
 
 @app.delete("/todolister/{i}")
-def slett_todoliste(i: int, api_key: str = Depends(sjekk_api_key), token: str = Depends(sjekk_login)):
+def slett_todoliste(i: int, api_key: str = Depends(sjekk_api_key)):
     d = les_data()
     if i >= len(d["todolister"]):
         raise HTTPException(status_code=404, detail="Todoliste ikke funnet")

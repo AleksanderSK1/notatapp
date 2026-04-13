@@ -1,7 +1,7 @@
 const API = "http://192.168.20.79:8000";
 const API_KEY = "notatapp-api";
 
-let TOKEN = ""
+let TOKEN = "";
 
 async function login() {
   const brukernavn = document.getElementById("brukernavn").value;
@@ -13,11 +13,28 @@ async function login() {
     body: JSON.stringify({ brukernavn, passord })
   });
 
+  if (!res.ok) {
+    alert("Feil login");
+    return;
+  }
+
   const data = await res.json();
   TOKEN = data.token;
+
+  if (!TOKEN) {
+    alert("Ingen token mottatt");
+    return;
+  }
+
+  alert("Innlogget");
 }
 
 async function lagreNotat() {
+  if (!TOKEN) {
+    alert("Du må logge inn");
+    return;
+  }
+
   const tittel = document.getElementById("tittel").value;
   const innhold = document.getElementById("innhold").value;
 
@@ -40,6 +57,11 @@ function leggTilOppgave() {
 }
 
 async function lagreTodo() {
+  if (!TOKEN) {
+    alert("Du må logge inn");
+    return;
+  }
+
   const todoTittel = document.getElementById("todoTittel").value;
   const oppgaveInputs = document.querySelectorAll("#oppgaver input");
 
@@ -61,12 +83,19 @@ async function lagreTodo() {
 }
 
 async function hentNotater() {
+  if (!TOKEN) {
+    alert("Du må logge inn");
+    return;
+  }
+
   const response = await fetch(API + "/notater", {
     headers: {
       "x-api-key": API_KEY,
       "x-token": TOKEN
     }
   });
+
+  if (!response.ok) return;
 
   const notater = await response.json();
 
@@ -83,12 +112,19 @@ async function hentNotater() {
 }
 
 async function hentTodolister() {
+  if (!TOKEN) {
+    alert("Du må logge inn");
+    return;
+  }
+
   const response = await fetch(API + "/todolister", {
     headers: {
       "x-api-key": API_KEY,
       "x-token": TOKEN
     }
   });
+
+  if (!response.ok) return;
 
   const todolister = await response.json();
 
@@ -111,6 +147,8 @@ async function hentTodolister() {
 }
 
 async function slettNotat(i) {
+  if (!TOKEN) return;
+
   await fetch(`${API}/notater/${i}`, {
     method: "DELETE",
     headers: {
@@ -123,6 +161,8 @@ async function slettNotat(i) {
 }
 
 async function endreNotat(i) {
+  if (!TOKEN) return;
+
   const tittel = prompt("Ny tittel:");
   const innhold = prompt("Nytt innhold:");
 
@@ -140,6 +180,8 @@ async function endreNotat(i) {
 }
 
 async function slettTodo(i) {
+  if (!TOKEN) return;
+
   await fetch(`${API}/todolister/${i}`, {
     method: "DELETE",
     headers: {
@@ -152,6 +194,8 @@ async function slettTodo(i) {
 }
 
 async function endreTodo(i) {
+  if (!TOKEN) return;
+
   const tittel = prompt("Ny tittel:");
 
   await fetch(`${API}/todolister/${i}`, {

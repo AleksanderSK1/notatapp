@@ -118,3 +118,19 @@ def slett_todoliste(i: int, api_key: str = Depends(sjekk_api_key)):
     d["todolister"].pop(i)
     skriv_data(d)
     return {"status": "slettet"}
+
+@app.post("/registrer")
+def registrer(data: dict):
+    d = les_data()
+
+    for bruker in d["brukere"]:
+        if bruker["brukernavn"] == data.get("brukernavn"):
+            raise HTTPException(status_code=400, detail="Bruker finnes")
+
+    d["brukere"].append({
+        "brukernavn": data.get("brukernavn"),
+        "passord": data.get("passord")
+    })
+
+    skriv_data(d)
+    return {"status": "opprettet"}

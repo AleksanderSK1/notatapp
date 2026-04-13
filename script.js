@@ -210,3 +210,20 @@ async function endreTodo(i) {
 
   hentTodolister();
 }
+
+async function registrer() {
+  const brukernavn = document.getElementById("brukernavn").value;
+  const passord = document.getElementById("passord").value;
+
+  const res = await fetch(API + "/registrer", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ brukernavn, passord })
+  });
+
+  if (res.ok) {
+    alert("Bruker opprettet");
+  } else {
+    alert("Feil");
+  }
+}
